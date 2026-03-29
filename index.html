@@ -5,91 +5,110 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Low Poly Workers — Whitelist</title>
   <style>
-    /* ─── RESET ─── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ─── BASE ─── */
     body {
       min-height: 100vh;
-      background: #0f0a06;
       font-family: 'Courier New', Courier, monospace;
-      color: #e8d5b0;
+      color: #1a0e06;
       overflow-x: hidden;
+      position: relative;
     }
 
-    /* ─── POLY BG ─── */
-    .poly-bg {
+    /* ── SKY + GROUND GRADIENT ── */
+    .bg-gradient {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        #7ec8e8 0%,
+        #a8d8f0 18%,
+        #c8e8f8 32%,
+        #e8c87a 55%,
+        #d4a84a 72%,
+        #b87830 88%,
+        #8b5520 100%
+      );
+      z-index: 0;
+    }
+
+    /* ── POLY SVG SCENE ── */
+    .poly-scene {
       position: fixed;
       inset: 0;
       width: 100%;
       height: 100%;
-      z-index: 0;
-      opacity: 0.15;
+      z-index: 1;
       pointer-events: none;
     }
 
-    /* ─── LAYOUT ─── */
+    /* ── WRAP ── */
     .wrap {
       position: relative;
-      z-index: 1;
+      z-index: 2;
       max-width: 460px;
       margin: 0 auto;
-      padding: 40px 16px 60px;
+      padding: 36px 16px 60px;
     }
 
-    /* ─── HEADER ─── */
+    /* ── HEADER ── */
     .header {
       text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
     }
     .header-label {
       font-size: 10px;
-      letter-spacing: 6px;
-      color: #cd853f;
+      letter-spacing: 5px;
+      color: #4a2a0a;
       text-transform: uppercase;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.4);
     }
     .header-title {
-      font-size: 30px;
+      font-size: 36px;
       font-weight: 900;
-      color: #f5deb3;
-      letter-spacing: 3px;
+      color: #1a0e06;
+      letter-spacing: 4px;
       text-transform: uppercase;
-      text-shadow: 0 0 40px #b5651d55;
+      text-shadow: 2px 2px 0 rgba(255,255,255,0.3), 0 0 40px rgba(255,200,100,0.4);
       margin-bottom: 8px;
+      line-height: 1;
     }
     .header-sub {
       font-size: 10px;
-      color: #7a5a3a;
+      color: #5a3a10;
       letter-spacing: 3px;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.3);
     }
 
-    /* ─── CARD ─── */
+    /* ── CARD ── */
     .card {
-      background: rgba(20, 12, 4, 0.90);
-      border: 1px solid #5a3a1a;
+      background: rgba(255, 245, 225, 0.88);
+      border: 2px solid rgba(180, 120, 40, 0.5);
+      border-radius: 2px;
       clip-path: polygon(14px 0%, 100% 0%, calc(100% - 14px) 100%, 0% 100%);
-      padding: 30px 28px 26px;
-      backdrop-filter: blur(12px);
+      padding: 28px 26px 24px;
+      backdrop-filter: blur(16px);
       margin-bottom: 16px;
+      box-shadow: 0 8px 40px rgba(100,60,10,0.25), inset 0 1px 0 rgba(255,255,255,0.6);
     }
 
-    /* ─── CHECKBOX ROW ─── */
+    /* ── CHECKBOX ── */
     .check-row {
       display: flex;
       align-items: flex-start;
       gap: 14px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       cursor: pointer;
       user-select: none;
     }
     .check-box {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       flex-shrink: 0;
-      margin-top: 2px;
-      background: transparent;
-      border: 2px solid #5a3a1a;
+      margin-top: 1px;
+      background: rgba(255,255,255,0.6);
+      border: 2px solid #b87830;
       clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
       display: flex;
       align-items: center;
@@ -97,36 +116,35 @@
       transition: all 0.2s;
     }
     .check-box.active {
-      background: #cd853f;
-      border-color: #cd853f;
+      background: #c4724a;
+      border-color: #8b4010;
     }
-    .check-tick {
-      color: #fff;
-      font-size: 11px;
-      font-weight: 900;
-      display: none;
-    }
+    .check-tick { color: #fff; font-size: 12px; font-weight: 900; display: none; }
     .check-box.active .check-tick { display: block; }
-    .check-label { font-size: 12px; font-weight: 700; color: #f5deb3; letter-spacing: 1px; }
-    .check-sub { font-size: 10px; color: #7a5a3a; margin-top: 3px; letter-spacing: 0.5px; }
-    .accent { color: #cd853f; }
+    .check-label { font-size: 12px; font-weight: 700; color: #1a0e06; letter-spacing: 1px; }
+    .check-sub { font-size: 10px; color: #7a4a20; margin-top: 3px; letter-spacing: 0.5px; }
+    .accent { color: #c4724a; }
 
-    /* ─── INPUT SECTION ─── */
+    /* ── DIVIDER ── */
+    .divider { border: none; border-top: 1px solid rgba(180,120,40,0.3); margin: 18px 0; }
+
+    /* ── INPUT ── */
     .field-label {
       font-size: 10px;
-      color: #cd853f;
+      color: #8b4010;
       letter-spacing: 3px;
       text-transform: uppercase;
       margin-bottom: 8px;
+      font-weight: 700;
     }
     .field-wrap { margin-bottom: 18px; }
 
     input[type="text"] {
       width: 100%;
-      background: rgba(180, 100, 30, 0.06);
-      border: 1px solid #5a3a1a;
-      border-bottom: 2px solid #cd853f;
-      color: #f5deb3;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(180,120,40,0.4);
+      border-bottom: 2px solid #c4724a;
+      color: #1a0e06;
       padding: 11px 13px;
       font-size: 13px;
       font-family: 'Courier New', monospace;
@@ -134,11 +152,12 @@
       letter-spacing: 0.5px;
       clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
       transition: border-color 0.2s;
+      border-radius: 0;
     }
-    input[type="text"]:focus { border-color: #cd853f; border-bottom-color: #f5deb3; }
-    input[type="text"]::placeholder { color: #5a3a1a; }
+    input[type="text"]:focus { border-bottom-color: #8b4010; }
+    input[type="text"]::placeholder { color: #b89060; }
 
-    /* ─── ERROR / SUCCESS ─── */
+    /* ── MESSAGES ── */
     .msg {
       padding: 9px 13px;
       font-size: 10px;
@@ -147,15 +166,15 @@
       clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
       display: none;
     }
-    .msg.error { background: rgba(180,30,30,0.15); border: 1px solid #8b2020; color: #e07070; }
-    .msg.success { background: rgba(30,100,30,0.15); border: 1px solid #2a6a2a; color: #70c070; }
+    .msg.error { background: rgba(180,30,30,0.12); border: 1px solid #c04040; color: #902020; }
+    .msg.success { background: rgba(30,120,30,0.12); border: 1px solid #3a8a3a; color: #1a6a1a; }
     .msg.show { display: block; }
 
-    /* ─── BUTTON ─── */
+    /* ── BUTTON ── */
     .btn {
       width: 100%;
       padding: 14px 0;
-      background: linear-gradient(135deg, #8b4513, #cd853f);
+      background: linear-gradient(135deg, #c4724a, #e8a050);
       border: none;
       color: #fff;
       font-size: 12px;
@@ -166,81 +185,95 @@
       clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
       transition: all 0.3s;
       font-family: 'Courier New', monospace;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 15px rgba(180,100,40,0.4);
     }
-    .btn:hover { background: linear-gradient(135deg, #a0521a, #e09050); }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn.ok { background: linear-gradient(135deg, #2d6a2d, #4a9a4a); }
+    .btn:hover { background: linear-gradient(135deg, #d4825a, #f0b060); transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn.ok { background: linear-gradient(135deg, #3a7a3a, #5aaa5a); }
 
-    /* ─── DIVIDER ─── */
-    .divider {
-      border: none;
-      border-top: 1px solid #3a2010;
-      margin: 20px 0;
-    }
-
-    /* ─── ENTRIES ─── */
+    /* ── ENTRIES ── */
     .entries-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 10px;
     }
-    .entries-title {
-      font-size: 9px;
-      letter-spacing: 4px;
-      color: #5a3a1a;
-      text-transform: uppercase;
-    }
-    .entries-count {
-      font-size: 10px;
-      color: #7a5a3a;
-      letter-spacing: 2px;
-    }
+    .entries-title { font-size: 9px; letter-spacing: 4px; color: #4a2a0a; text-transform: uppercase; }
+    .entries-count { font-size: 10px; color: #5a3a10; letter-spacing: 2px; }
+
     .entry-row {
       display: flex;
       align-items: center;
       gap: 8px;
-      background: rgba(20, 12, 4, 0.7);
-      border: 1px solid #3a2010;
+      background: rgba(255, 245, 220, 0.80);
+      border: 1px solid rgba(180,120,40,0.35);
       padding: 8px 11px;
       clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
       margin-bottom: 5px;
       animation: fadeIn 0.3s ease;
+      box-shadow: 0 2px 8px rgba(100,60,10,0.1);
     }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
-    .entry-num { font-size: 9px; color: #5a3a1a; min-width: 24px; }
-    .entry-addr { font-size: 11px; color: #e8d5b0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .entry-check { font-size: 9px; color: #4a8a4a; flex-shrink: 0; }
+    .entry-num { font-size: 9px; color: #8b6030; min-width: 24px; }
+    .entry-addr { font-size: 11px; color: #1a0e06; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .entry-check { font-size: 9px; color: #3a7a3a; flex-shrink: 0; font-weight: 700; }
 
-    /* ─── FOOTER NOTE ─── */
+    /* ── FOOTER ── */
     .footer-note {
       text-align: center;
       font-size: 9px;
-      color: #3a2010;
+      color: rgba(80,40,10,0.5);
       letter-spacing: 2px;
-      margin-top: 32px;
+      margin-top: 28px;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.3);
     }
   </style>
 </head>
 <body>
 
-<!-- Poly SVG background -->
-<svg class="poly-bg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
-  <polygon points="0,0 200,80 100,200" fill="#b5651d"/>
-  <polygon points="200,80 400,0 300,160" fill="#8b4513"/>
-  <polygon points="400,0 600,100 500,200" fill="#cd853f"/>
-  <polygon points="600,100 800,0 800,200" fill="#a0522d"/>
-  <polygon points="0,200 100,200 0,400" fill="#6b3a2a"/>
-  <polygon points="100,200 300,160 200,350" fill="#9c6b3a"/>
-  <polygon points="300,160 500,200 400,380" fill="#7a4a1e"/>
-  <polygon points="500,200 800,200 700,400" fill="#b87333"/>
-  <polygon points="0,400 200,350 100,550" fill="#8b5e3c"/>
-  <polygon points="200,350 400,380 300,600" fill="#6b4226"/>
-  <polygon points="400,380 700,400 600,600" fill="#a0522d"/>
-  <polygon points="700,400 800,200 800,600" fill="#7a3b1e"/>
-  <polygon points="0,550 100,550 0,600" fill="#5a2d0c"/>
-  <polygon points="100,550 300,600 200,600" fill="#7a4a1e"/>
-  <polygon points="600,600 800,600 700,400" fill="#4a1a0a"/>
+<!-- Sky/ground gradient -->
+<div class="bg-gradient"></div>
+
+<!-- Low poly desert scene -->
+<svg class="poly-scene" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+  <!-- Clouds -->
+  <polygon points="80,60 160,40 220,65 140,80" fill="rgba(255,255,255,0.7)"/>
+  <polygon points="160,40 260,25 300,55 220,65" fill="rgba(255,255,255,0.6)"/>
+  <polygon points="500,45 600,30 650,55 560,68" fill="rgba(255,255,255,0.65)"/>
+  <polygon points="600,30 700,20 730,48 650,55" fill="rgba(255,255,255,0.55)"/>
+  <polygon points="320,35 390,22 420,45 350,58" fill="rgba(255,255,255,0.5)"/>
+
+  <!-- Distant mesa / flat top mountains -->
+  <polygon points="0,280 120,200 240,280" fill="#c4845a"/>
+  <polygon points="120,200 280,180 380,280 240,280" fill="#b87040"/>
+  <polygon points="560,210 680,185 800,250 800,280 560,280" fill="#c08050"/>
+  <polygon points="400,220 520,195 620,260 480,270" fill="#b06838"/>
+
+  <!-- Ground / sand -->
+  <polygon points="0,400 800,380 800,600 0,600" fill="#d4a84a"/>
+  <polygon points="0,450 300,420 500,440 800,410 800,600 0,600" fill="#c49030"/>
+  <polygon points="0,500 200,480 400,490 600,475 800,488 800,600 0,600" fill="#b07820"/>
+
+  <!-- Left canyon rocks -->
+  <polygon points="0,340 80,260 160,310 120,400 0,420" fill="#a05030"/>
+  <polygon points="80,260 180,230 200,300 160,310" fill="#b86040"/>
+  <polygon points="0,300 60,250 80,260 0,340" fill="#8b3820"/>
+
+  <!-- Right canyon rocks -->
+  <polygon points="680,250 800,220 800,380 700,360" fill="#a04828"/>
+  <polygon points="640,280 720,240 760,290 700,330 640,320" fill="#b85a38"/>
+  <polygon points="720,240 800,220 800,260 760,290" fill="#c87050"/>
+
+  <!-- Cacti (simple triangles) -->
+  <polygon points="200,370 208,310 216,370" fill="#5a8a3a"/>
+  <polygon points="196,340 208,335 196,360" fill="#5a8a3a"/>
+  <polygon points="580,380 588,330 596,380" fill="#4a7a2a"/>
+  <polygon points="576,355 588,350 576,375" fill="#4a7a2a"/>
+  <polygon points="350,390 356,350 362,390" fill="#5a8a3a"/>
+
+  <!-- Ground shadow / depth -->
+  <polygon points="0,580 800,560 800,600 0,600" fill="rgba(100,60,10,0.3)"/>
 </svg>
 
 <div class="wrap">
@@ -255,7 +288,6 @@
   <!-- Form Card -->
   <div class="card">
 
-    <!-- Follow -->
     <div class="check-row" onclick="toggle('followed')">
       <div class="check-box" id="box-followed"><span class="check-tick">✓</span></div>
       <div>
@@ -264,7 +296,6 @@
       </div>
     </div>
 
-    <!-- Like & RT -->
     <div class="check-row" onclick="toggle('likedRt')">
       <div class="check-box" id="box-likedRt"><span class="check-tick">✓</span></div>
       <div>
@@ -275,22 +306,19 @@
 
     <hr class="divider" />
 
-    <!-- Address input -->
     <div class="field-wrap">
       <div class="field-label">◆ ETH Wallet Address</div>
       <input type="text" id="addr-input" placeholder="0x... or yourname.eth" autocomplete="off" autocapitalize="none" spellcheck="false" />
     </div>
 
-    <!-- Messages -->
     <div class="msg error" id="msg-error"></div>
     <div class="msg success" id="msg-success"></div>
 
-    <!-- Submit -->
     <button class="btn" id="submit-btn" onclick="handleSubmit()">◆ SUBMIT WALLET</button>
 
   </div>
 
-  <!-- Session entries (this session only — all saved to Supabase) -->
+  <!-- Session entries -->
   <div id="entries-section" style="display:none;">
     <div class="entries-header">
       <div class="entries-title">◆ This session</div>
@@ -304,18 +332,17 @@
 </div>
 
 <script>
-  // ─── CONFIG — swap these two lines ───────────────────────────────────────
-  const SUPABASE_URL  = 'YOUR_SUPABASE_URL';        // e.g. https://xxxx.supabase.co
-  const SUPABASE_KEY  = 'YOUR_SUPABASE_ANON_KEY';   // long anon/public key
-  const TABLE         = 'lowpoly_wl';               // your Supabase table name
+  // ─── CONFIG ───────────────────────────────────────────────────────────────
+  const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+  const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+  const TABLE        = 'lowpoly_wl';
   // ─────────────────────────────────────────────────────────────────────────
 
   const state = { followed: false, likedRt: false, sessionEntries: [] };
 
   function toggle(key) {
     state[key] = !state[key];
-    const box = document.getElementById('box-' + key);
-    box.classList.toggle('active', state[key]);
+    document.getElementById('box-' + key).classList.toggle('active', state[key]);
   }
 
   function isValidEth(addr) {
@@ -336,8 +363,7 @@
   }
 
   function truncate(addr) {
-    if (addr.endsWith('.eth')) return addr;
-    return addr.slice(0, 8) + '...' + addr.slice(-6);
+    return addr.endsWith('.eth') ? addr : addr.slice(0, 8) + '...' + addr.slice(-6);
   }
 
   function addSessionEntry(addr) {
@@ -347,7 +373,6 @@
     const count   = document.getElementById('session-count');
     section.style.display = 'block';
     count.textContent = state.sessionEntries.length + ' submitted';
-
     const row = document.createElement('div');
     row.className = 'entry-row';
     row.innerHTML = `
@@ -360,8 +385,8 @@
 
   async function handleSubmit() {
     showMsg(null);
-    const addr  = document.getElementById('addr-input').value.trim();
-    const btn   = document.getElementById('submit-btn');
+    const addr = document.getElementById('addr-input').value.trim();
+    const btn  = document.getElementById('submit-btn');
 
     if (!state.followed) return showMsg('error', 'Confirm you followed @lowpolygyy');
     if (!state.likedRt)  return showMsg('error', "Confirm you liked & RT'd the post");
@@ -385,8 +410,7 @@
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        // Supabase unique violation = duplicate
-        if (res.status === 409 || (err.code === '23505')) {
+        if (res.status === 409 || err.code === '23505') {
           showMsg('error', 'Address already registered');
         } else {
           showMsg('error', 'Save failed — try again');
@@ -414,7 +438,6 @@
     }
   }
 
-  // Submit on Enter key
   document.getElementById('addr-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') handleSubmit();
   });
